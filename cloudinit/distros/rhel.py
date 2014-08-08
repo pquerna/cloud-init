@@ -104,6 +104,7 @@ class Distro(distros.Distro):
                 lines.append("SLAVE=yes")
                 files[fn] = "\n".join(lines)
 
+        dns = nc.get_dns_servers()
         networks = nc.get_networks()
         for net in networks:
             # only have support for ipv4 so far.
@@ -138,6 +139,10 @@ class Distro(distros.Distro):
             # TODO: hmmm
             if len(gwroute) == 1:
                 lines.append("GATEWAY={0}".format(gwroute[0]['gateway']))
+                i = 1
+                for server in dns:
+                    lines.append("DNS{0}={1}".format(i, server))
+                    i += 1
 
             files[fn] = "\n".join(lines)
 

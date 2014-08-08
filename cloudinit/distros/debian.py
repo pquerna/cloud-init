@@ -97,6 +97,7 @@ class Distro(distros.Distro):
             chunk.append("")
             lines.extend(chunk)
 
+        dns = nc.get_dns_servers()
         networks = nc.get_networks()
         for net in networks:
             # only have support for ipv4 so far.
@@ -119,6 +120,7 @@ class Distro(distros.Distro):
             # TODO: hmmm
             if len(gwroute) == 1:
                 chunk.append("  gateway {0}".format(gwroute[0]['gateway']))
+                chunk.append("  dns-nameservers {0}".format(" ".join(dns)))
 
             for route in net['routes']:
                 if route['network'] == '0.0.0.0':
@@ -132,7 +134,7 @@ class Distro(distros.Distro):
         return {'/etc/network/interfaces': "\n".join(lines)}
 
     def _write_network_json(self, settings):
-        files = self._rhel_network_json(settings)
+        files = self._debian_network_json(settings)
         for (fn, data) in files.iteritems():
             util.write_file(fn, data)
         return ['all']

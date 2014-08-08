@@ -192,3 +192,6 @@ class NetConfHelper(object):
 
     def get_networks(self):
         return self._settings['networks']
+
+    def get_dns_servers(self):
+        return [x['address'] for x in self._settings['services'] if x['type'] == "dns"]
