@@ -119,7 +119,7 @@ class Distro(distros.Distro):
             lines.append("# Created by cloud-init on instance boot.")
             lines.append("#")
             lines.append("# network: {0}".format(net['id']))
-            lines.append("# neutron_network_id: {0}".format(net['neutron_network_id']))
+            lines.append("# network_id: {0}".format(net['network_id']))
             lines.append("")
             lines.append("DEVICE={0}".format(devname))
             if link['type'] == "vlan":

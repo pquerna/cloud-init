@@ -108,7 +108,7 @@ class Distro(distros.Distro):
             devname = nc.get_link_devname(link)
             chunk = []
             chunk.append("# network: {0}".format(net['id']))
-            chunk.append("# neutron_network_id: {0}".format(net['neutron_network_id']))
+            chunk.append("# network_id: {0}".format(net['network_id']))
             chunk.append("auto {0}".format(devname))
             chunk.append("iface {0} inet static".format(devname))
             if link['type'] == "vlan":

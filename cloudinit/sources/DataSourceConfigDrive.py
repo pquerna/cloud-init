@@ -193,7 +193,7 @@ def on_first_boot(data, distro=None):
                         % (type(data)))
 
     networkapplied = False
-    jsonnet_conf = data.get('vendordata_raw', {}).get('network')
+    jsonnet_conf = data.get('vendordata_raw', {}).get('network_info')
     if jsonnet_conf:
         try:
             distro_user_config = distro.apply_network_json(jsonnet_conf)
