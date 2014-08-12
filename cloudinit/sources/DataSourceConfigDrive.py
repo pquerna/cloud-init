@@ -160,7 +160,7 @@ def get_ds_mode(cfgdrv_ver, ds_cfg=None, user=None):
     return "net"
 
 
-def read_config_drive(source_dir, version="2012-08-10"):
+def read_config_drive(source_dir, version="2013-10-17"):
     reader = openstack.ConfigDriveReader(source_dir)
     finders = [
         (reader.read_v2, [], {'version': version}),
@@ -193,9 +193,10 @@ def on_first_boot(data, distro=None):
                         % (type(data)))
 
     networkapplied = False
-    jsonnet_conf = data.get('vendordata_raw', {}).get('network_info')
+    jsonnet_conf = data.get('vendordata', {}).get('network_info')
     if jsonnet_conf:
         try:
+            LOG.debug("Updating network interfaces from JSON in config drive")
             distro_user_config = distro.apply_network_json(jsonnet_conf)
             networkapplied = True
         except NotImplementedError:
