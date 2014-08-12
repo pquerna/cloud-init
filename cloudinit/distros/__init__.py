@@ -122,7 +122,7 @@ class Distro(object):
                                         mirror_info=arch_info)
 
     def apply_network_json(self, settings, bring_up=True):
-        dev_names = self._write_network_from_json(settings)
+        dev_names = self._write_network_json(settings)
         if bring_up:
             return self._bring_up_interfaces(dev_names)
         return False
