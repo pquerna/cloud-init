@@ -28,6 +28,7 @@ from cloudinit import util
 from cloudinit.distros import net_util
 from cloudinit.distros import rhel_util
 from cloudinit.settings import PER_INSTANCE
+from cloudinit.distros.net_util import NetConfHelper
 
 LOG = logging.getLogger(__name__)
 
@@ -63,6 +64,7 @@ class Distro(distros.Distro):
         self.package_command('install', pkgs=pkglist)
 
     def _rhel_network_json(self, settings):
+        devs = []
         # depends add redhat-lsb-core
         nc = NetConfHelper(settings)
         iffn = '/etc/sysconfig/network-scripts/ifcfg-{0}'
@@ -78,6 +80,7 @@ class Distro(distros.Distro):
             lines.append("#")
             lines.append("")
             lines.append("DEVICE={0}".format(bond['id']))
+            devs.append(bond['id'])
             lines.append("ONBOOT=yes")
             lines.append("BOOTPROTO=none")
             lines.append("USERCTL=no")
@@ -95,6 +98,7 @@ class Distro(distros.Distro):
                 lines.append("#")
                 lines.append("")
                 lines.append("DEVICE={0}".format(slavedev))
+                devs.append(slavedev)
                 lines.append("ONBOOT=yes")
                 lines.append("BOOTPROTO=none")
                 lines.append("USERCTL=no")
@@ -122,6 +126,7 @@ class Distro(distros.Distro):
             lines.append("# network_id: {0}".format(net['network_id']))
             lines.append("")
             lines.append("DEVICE={0}".format(devname))
+            devs.append(devname)
             if link['type'] == "vlan":
                 lines.append("VLAN=yes")
                 lines.append("PHYSDEV={0}".format(devname[:devname.rfind('.')]))
@@ -162,13 +167,13 @@ class Distro(distros.Distro):
                 lines.insert(0, "# Created by cloud-init on instance boot.")
                 files[fn] = "\n".join(lines)
 
-        return files
+        return files, devs
 
     def _write_network_json(self, settings):
-        files = self._rhel_network_json(settings)
+        files, devs = self._rhel_network_json(settings)
         for (fn, data) in files.iteritems():
             util.write_file(fn, data)
-        return ['all']
+        return devs
 
     def _write_network(self, settings):
         # TODO(harlowja) fix this... since this is the ubuntu format
