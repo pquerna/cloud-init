@@ -193,7 +193,7 @@ def on_first_boot(data, distro=None):
                         % (type(data)))
 
     networkapplied = False
-    jsonnet_conf = data.get('vendordata', {}).get('network_info')
+    jsonnet_conf = data.get('vendordata_json', {}).get('network_info')
     if jsonnet_conf:
         try:
             LOG.debug("Updating network interfaces from JSON in config drive")
