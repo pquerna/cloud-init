@@ -212,6 +212,8 @@ class Distro(distros.Distro):
         return dev_names
 
     def _dist_uses_systemd(self):
+        # TODO(pquerna): Figure out a more portable way of detecting systemd
+        #                as the active init system. There are other distros out there.
         # Fedora 18 and RHEL 7 were the first adopters in their series
         (dist, vers) = util.system_info()['dist'][:2]
         major = (int)(vers.split('.')[0])
