@@ -211,15 +211,10 @@ class BaseReader(object):
                 False,
                 lambda x: x,
             )
-            files['vendordata_json'] = (
+            files['vendordata'] = (
                 self._path_join("openstack", version, 'vendor_data.json'),
                 False,
                 util.load_json,
-            )
-            files['vendordata'] = (
-                self._path_join("openstack", version, 'vendor_data'),
-                False,
-                lambda x: x,
             )
             return files
 

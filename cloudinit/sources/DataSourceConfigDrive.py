@@ -19,6 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import json
 
 from cloudinit import log as logging
 from cloudinit import sources
@@ -125,7 +126,19 @@ class DataSourceConfigDrive(openstack.SourceMixin, sources.DataSource):
         self.userdata_raw = results.get('userdata')
         self.version = results['version']
         self.files.update(results.get('files', {}))
-        self.vendordata_raw = results.get('vendordata')
+
+        # if vendordata includes 'cloud-init', then read that explicitly
+        # for cloud-init (for namespacing).
+        vd = results.get('vendordata')
+        if isinstance(vd, dict):
+            if 'cloud-init' in vd:
+                self.vendordata_raw = vd['cloud-init']
+            else:
+                # TODO(pquerna): this is so wrong.
+                self.vendordata_raw = json.dumps(vd)
+        else:
+            self.vendordata_raw = vd
+
         return True
 
 
@@ -193,7 +206,7 @@ def on_first_boot(data, distro=None):
                         % (type(data)))
 
     networkapplied = False
-    jsonnet_conf = data.get('vendordata_json', {}).get('network_info')
+    jsonnet_conf = data.get('vendordata', {}).get('network_info')
     if jsonnet_conf:
         try:
             LOG.debug("Updating network interfaces from JSON in config drive")
