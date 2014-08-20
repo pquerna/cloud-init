@@ -73,6 +73,7 @@ class Distro(distros.Distro):
         self.package_command('install', pkgs=pkglist)
 
     def _debian_network_json(self, settings):
+        devs = []
         nc = NetConfHelper(settings)
         lines = []
 
@@ -89,10 +90,17 @@ class Distro(distros.Distro):
         bonds = nc.get_links_by_type('bond')
         for bond in bonds:
             chunk = []
+            slaves = [nc.get_link_devname(nc.get_link_by_name(x)) for x in bond['bond_links']]
+            for slave in slaves:
+                chunk.append("auto {0}".format(slave))
+                chunk.append("iface {0} inet manual".format(slave))
+                chunk.append("  bond-master {0}".format(bond['id']))
+                chunk.append("")
+            devs.append(bond['id'])
+            devs.extend(slaves)
             chunk.append("auto {0}".format(bond['id']))
             chunk.append("iface {0} inet manual".format(bond['id']))
             chunk.append('  bond-mode {0}'.format(bond['bond_mode']))
-            slaves = [nc.get_link_devname(nc.get_link_by_name(x)) for x in bond['bond_links']]
             chunk.append('  bond-slaves {0}'.format(' '.join(slaves)))
             chunk.append("")
             lines.extend(chunk)
@@ -111,6 +119,8 @@ class Distro(distros.Distro):
             chunk.append("# network_id: {0}".format(net['network_id']))
             chunk.append("auto {0}".format(devname))
             chunk.append("iface {0} inet static".format(devname))
+
+            devs.append(devname)
             if link['type'] == "vlan":
                 chunk.append("  vlan_raw_device {0}".format(devname[:devname.rfind('.')]))
                 chunk.append("  hwaddress ether {0}".format(link['ethernet_mac_address']))
@@ -131,13 +141,13 @@ class Distro(distros.Distro):
                     route['netmask'], route['gateway']))
             chunk.append("")
             lines.extend(chunk)
-        return {'/etc/network/interfaces': "\n".join(lines)}
+        return {'/etc/network/interfaces': "\n".join(lines)}, devs
 
     def _write_network_json(self, settings):
-        files = self._debian_network_json(settings)
+        files, devs = self._debian_network_json(settings)
         for (fn, data) in files.iteritems():
             util.write_file(fn, data)
-        return ['all']
+        return devs
 
     def _write_network(self, settings):
         util.write_file(self.network_conf_fn, settings)
