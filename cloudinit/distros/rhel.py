@@ -140,6 +140,8 @@ class Distro(distros.Distro):
                 lines.append("VLAN=yes")
                 lines.append("PHYSDEV={0}".format(devname[:devname.rfind('.')]))
                 lines.append("MACADDR={0}".format(link['ethernet_mac_address']))
+                if link.has_key('mtu'):
+                    chunk.append('MTU={0}'.format(link['mtu']))
 
             lines.append("ONBOOT=yes")
             lines.append("BOOTPROTO=static")

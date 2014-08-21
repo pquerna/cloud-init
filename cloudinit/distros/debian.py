@@ -129,6 +129,9 @@ class Distro(distros.Distro):
             if link['type'] == "vlan":
                 chunk.append("  vlan_raw_device {0}".format(devname[:devname.rfind('.')]))
                 chunk.append("  hwaddress ether {0}".format(link['ethernet_mac_address']))
+                if link.has_key('mtu'):
+                    chunk.append('  mtu {0}'.format(link['mtu']))
+
             chunk.append("  address {0}".format(net['ip_address']))
             chunk.append("  netmask {0}".format(net['netmask']))
             gwroute = [route for route in net['routes'] if route['network'] == '0.0.0.0']
