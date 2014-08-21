@@ -86,8 +86,17 @@ class Distro(distros.Distro):
             lines.append("USERCTL=no")
             lines.append("NM_CONTROLLED=no")
             lines.append("TYPE=Ethernet")
-            lines.append("BONDING_OPTS=\"mode={0}\"".format(bond['bond_mode']))
+
+            opts = []
+            if bond.has_key('bond_mode'):
+                opts.append('mode={0}'.format(bond['bond_mode']))
+            if bond.has_key('bond_xmit_hash_policy'):
+                opts.append('xmit_hash_policy={0}'.format(bond['bond_xmit_hash_policy']))
+            if bond.has_key('bond_miimon'):
+                opts.append('miimon={0}'.format(bond['bond_miimon']))
+            lines.append("BONDING_OPTS=\"{0}\"".format(" ".join(opts)))
             files[fn] = "\n".join(lines)
+
 
             for slave in bond['bond_links']:
                 slavelink = nc.get_link_by_name(slave)

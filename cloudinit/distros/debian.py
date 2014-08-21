@@ -100,7 +100,12 @@ class Distro(distros.Distro):
             devs.extend(slaves)
             chunk.append("auto {0}".format(bond['id']))
             chunk.append("iface {0} inet manual".format(bond['id']))
-            chunk.append('  bond-mode {0}'.format(bond['bond_mode']))
+            if bond.has_key('bond_mode'):
+                chunk.append('  bond-mode {0}'.format(bond['bond_mode']))
+            if bond.has_key('bond_xmit_hash_policy'):
+                chunk.append('  bond_xmit_hash_policy {0}'.format(bond['bond_xmit_hash_policy']))
+            if bond.has_key('bond_miimon'):
+                chunk.append('  bond-miimon {0}'.format(bond['bond_miimon']))
             chunk.append('  bond-slaves {0}'.format(' '.join(slaves)))
             chunk.append("")
             lines.extend(chunk)
