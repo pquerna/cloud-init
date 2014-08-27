@@ -200,7 +200,7 @@ def _parse_ifconfig_output(stdout):
     return result
 
 def find_mac_addresses():
-    output = subprocess.check_output(["ifconfig", "-a"])
+    output = util.subp(["ifconfig", "-a"])
     return _parse_ifconfig_output(output)
 
 def debug_info(prefix='ci-info: '):
